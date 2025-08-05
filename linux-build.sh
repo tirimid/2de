@@ -3,7 +3,7 @@
 INCLUDE="-I. -Isrc"
 DEFINES=""
 WARNINGS="-Wall -Wextra -Wshadow"
-LIBRARIES="$(pkg-config --cflags --libs sdl3 sdl3-image sdl3-ttf)"
+LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf)"
 CFLAGS="-std=c99 -pedantic -O3 -D_GNU_SOURCE"
 
 CC=gcc
