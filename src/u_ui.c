@@ -6,7 +6,7 @@ typedef enum u_elemtype
 	U_BUTTON
 } u_elemtype_t;
 
-typedef enum u_elem
+typedef union u_elem
 {
 	// all UI elements have at least these properties.
 	struct
@@ -68,7 +68,32 @@ u_render(void)
 	}
 	
 	// draw panel.
-	// TODO: implement.
+	SDL_SetRenderDrawColor(r_rend, O_UIPANELCOLOR);
+	SDL_Rect r =
+	{
+		minx - O_UIPAD,
+		miny - O_UIPAD,
+		maxx - minx + 2 * O_UIPAD,
+		maxy - miny + 2 * O_UIPAD
+	};
+	SDL_RenderFillRect(r_rend, &r);
+	
+	// draw UI elements.
+	for (usize i = 0; i < u_nelems; ++i)
+	{
+		i32 x = u_elems[i].any.x, y = u_elems[i].any.y;
+		i32 w = u_elems[i].any.w, h = u_elems[i].any.h;
+		
+		switch (u_elems[i].any.type)
+		{
+		case U_LABEL:
+			// TODO: implement.
+			break;
+		case U_BUTTON:
+			// TODO: implement.
+			break;
+		}
+	}
 }
 
 void

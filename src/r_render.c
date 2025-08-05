@@ -51,5 +51,8 @@ r_init(void)
 		}
 	}
 	
+	// set initial state.
+	SDL_SetRenderDrawBlendMode(r_rend, SDL_BLENDMODE_BLEND);
+	
 	return 0;
 }

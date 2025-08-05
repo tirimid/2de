@@ -20,3 +20,7 @@
 #define O_FONTSIZE 24
 #define O_UIFONT R_VCROSDMONO
 #define O_UIPAD 20
+
+// color options.
+#define O_BGCOLOR 80, 80, 80, 255
+#define O_UIPANELCOLOR 0, 0, 0, 128
