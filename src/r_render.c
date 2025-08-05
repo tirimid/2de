@@ -1,24 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#define R_INCFONT(name) \
-	{ \
-		.data = name##_ttf, \
-		.size = &name##_ttf_len \
-	}
-
-typedef struct r_fontdata
-{
-	u8 const *data;
-	u32 const *size;
-	TTF_Font *font;
-} r_fontdata_t;
-
 SDL_Window *r_wnd;
 SDL_Renderer *r_rend;
+TTF_Font *r_fonts[R_FONT_END];
 
-static r_fontdata_t r_fonts[R_FONT_END] =
+static resdata_t r_fontres[R_FONT_END] =
 {
-	R_INCFONT(vcr_osd_mono)
+	INCRES(vcr_osd_mono_ttf)
 };
 
 i32
@@ -48,15 +36,15 @@ r_init(void)
 	// set up fonts.
 	for (usize i = 0; i < R_FONT_END; ++i)
 	{
-		SDL_RWops *rwops = SDL_RWFromConstMem(r_fonts[i].data, *r_fonts[i].size);
+		SDL_RWops *rwops = SDL_RWFromConstMem(r_fontres[i].data, *r_fontres[i].size);
 		if (!rwops)
 		{
 			showerr("render: failed to create font RWops - %s!", SDL_GetError());
 			return 1;
 		}
 		
-		r_fonts[i].font = TTF_OpenFontRW(rwops, 1, O_FONTSIZE);
-		if (!r_fonts[i].font)
+		r_fonts[i] = TTF_OpenFontRW(rwops, 1, O_FONTSIZE);
+		if (!r_fonts[i])
 		{
 			showerr("render: failed to open font - %s!", TTF_GetError());
 			return 1;

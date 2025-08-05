@@ -14,6 +14,9 @@
 #define O_TICKMS 20
 #define O_TICKUS (1000 * O_TICKMS)
 #define O_MAXLOGLEN 512
+#define O_MAXUIELEMS 128
 
 // stylistic options.
 #define O_FONTSIZE 24
+#define O_UIFONT R_VCROSDMONO
+#define O_UIPAD 20
