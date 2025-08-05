@@ -56,3 +56,26 @@ r_init(void)
 	
 	return 0;
 }
+
+SDL_Texture *
+r_rendertext(r_font_t font, char const *text, u8 r, u8 g, u8 b, u8 a)
+{
+	SDL_Surface *surf = TTF_RenderUTF8_Solid(
+		r_fonts[font],
+		text,
+		(SDL_Color){r, g, b, a}
+	);
+	if (!surf)
+	{
+		return NULL;
+	}
+	
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(r_rend, surf);
+	SDL_FreeSurface(surf);
+	if (!tex)
+	{
+		return NULL;
+	}
+	
+	return tex;
+}

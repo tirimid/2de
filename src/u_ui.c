@@ -79,6 +79,9 @@ u_render(void)
 	SDL_RenderFillRect(r_rend, &r);
 	
 	// draw UI elements.
+	i32 mx, my;
+	i_mpos(&mx, &my);
+	
 	for (usize i = 0; i < u_nelems; ++i)
 	{
 		i32 x = u_elems[i].any.x, y = u_elems[i].any.y;
@@ -87,11 +90,44 @@ u_render(void)
 		switch (u_elems[i].any.type)
 		{
 		case U_LABEL:
-			// TODO: implement.
+		{
+			SDL_Texture *tex = r_rendertext(O_UIFONT, u_elems[i].label.text, O_UITEXTCOLOR);
+			
+			r = (SDL_Rect){x, y, w, h};
+			SDL_RenderCopy(r_rend, tex, NULL, &r);
+			SDL_DestroyTexture(tex);
+			
 			break;
+		}
 		case U_BUTTON:
-			// TODO: implement.
+		{
+			if (mx >= x && my >= y && mx < x + w && my < y + h)
+			{
+				if (i_mdown(SDL_BUTTON_LEFT))
+				{
+					SDL_SetRenderDrawColor(r_rend, O_UIBUTTONPRESSCOLOR);
+				}
+				else
+				{
+					SDL_SetRenderDrawColor(r_rend, O_UIBUTTONHOVERCOLOR);
+				}
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(r_rend, O_UIBUTTONCOLOR);
+			}
+			
+			r = (SDL_Rect){x, y, w, h};
+			SDL_RenderFillRect(r_rend, &r);
+			
+			SDL_Texture *tex = r_rendertext(O_UIFONT, u_elems[i].label.text, O_UITEXTCOLOR);
+			
+			r = (SDL_Rect){x + O_UIPAD, y + O_UIPAD, w - 2 * O_UIPAD, h - 2 * O_UIPAD};
+			SDL_RenderCopy(r_rend, tex, NULL, &r);
+			SDL_DestroyTexture(tex);
+			
 			break;
+		}
 		}
 	}
 }
