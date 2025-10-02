@@ -14,7 +14,6 @@ games.
 * Make (for asset build, optional)
 * xxd (for asset build, optional)
 * SDL2
-* SDL2 image
 * SDL2 TTF
 * MSYS2/MinGW64 (for windows build)
 * wget (for windows build setup)

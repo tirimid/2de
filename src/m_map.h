@@ -7,7 +7,7 @@
 #define M_MAXHEIGHT 65535
 #define M_MAXREGIONS 65535
 #define M_MAXATTRS 65535
-#define M_MAXATTRLISTS 65535
+#define M_MAXATTRLISTS 65534 // -1 because attribute lists are 1-indexed.
 
 // map file structure; start to end, data is packed.
 //
@@ -38,6 +38,9 @@
 //
 // L             attribute list lengths
 // 32 * L        attribute lists
+//
+// 8             magic string (duplicate)
+// 1             version (duplicate)
 //
 // note:
 // * T = map width * map height
@@ -98,6 +101,8 @@ typedef struct m_map
 
 extern m_map_t m_map;
 
+i32 m_init(void);
 i32 m_read(FILE *fp);
 i32 m_write(FILE *fp);
 void m_render(void);
+void m_renderoutlines(void);

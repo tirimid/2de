@@ -5,8 +5,8 @@
 #define O_IMGFLAGS IMG_INIT_PNG
 #define O_ERRWNDTITLE "2de - Error"
 #define O_WNDTITLE "2de"
-#define O_WNDWIDTH 800
-#define O_WNDHEIGHT 600
+#define O_WNDWIDTH 900
+#define O_WNDHEIGHT 700
 #define O_WNDFLAGS (SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED)
 #define O_RENDFLAGS 0
 
@@ -19,7 +19,11 @@
 #define O_UIFONT R_VCROSDMONO
 #define O_UIPAD 5
 #define O_UITEXTFIELDBAR 2
+#define O_DRAWSCALE 50
+#define O_SAVEBAR 10
 #define O_BGCOLOR 80, 80, 80, 255
+#define O_SAVEDCOLOR 0, 255, 0, 255
+#define O_UNSAVEDCOLOR 255, 0, 0, 255
 
 typedef struct o_opt
 {

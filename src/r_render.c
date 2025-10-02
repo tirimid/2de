@@ -111,3 +111,49 @@ r_zrendertext(i32 x, i32 y, i32 w, i32 h, char const *text, z_color_t col)
 	SDL_RenderCopy(r_rend, tex, NULL, &r);
 	SDL_DestroyTexture(tex);
 }
+
+void
+r_screen2game(OUT f32 *gx, OUT f32 *gy, i32 sx, i32 sy)
+{
+	i32 wndw, wndh;
+	SDL_GetWindowSize(r_wnd, &wndw, &wndh);
+	
+	*gx = (sx - wndw / 2) / (e_editor.camzoom * O_DRAWSCALE) + e_editor.camx;
+	*gy = (sy - wndh / 2) / (e_editor.camzoom * O_DRAWSCALE) + e_editor.camy;
+}
+
+void
+r_game2screen(OUT i32 *sx, OUT i32 *sy, f32 gx, f32 gy)
+{
+	i32 wndw, wndh;
+	SDL_GetWindowSize(r_wnd, &wndw, &wndh);
+	
+	*sx = e_editor.camzoom * O_DRAWSCALE * (gx - e_editor.camx) + wndw / 2;
+	*sy = e_editor.camzoom * O_DRAWSCALE * (gy - e_editor.camy) + wndh / 2;
+}
+
+void
+r_renderrelrect(f32 x, f32 y, f32 w, f32 h)
+{
+	// 1 is added to pixel width and height in order to remove any seams that
+	// appear as a result of dynamic camera movement / zooming.
+	SDL_Rect r =
+	{
+		.w = e_editor.camzoom * O_DRAWSCALE * w + 1,
+		.h = e_editor.camzoom * O_DRAWSCALE * h + 1
+	};
+	r_game2screen(&r.x, &r.y, x, y);
+	SDL_RenderFillRect(r_rend, &r);
+}
+
+void
+r_renderrelhollowrect(f32 x, f32 y, f32 w, f32 h)
+{
+	SDL_Rect r =
+	{
+		.w = e_editor.camzoom * O_DRAWSCALE * w + 1,
+		.h = e_editor.camzoom * O_DRAWSCALE * h + 1
+	};
+	r_game2screen(&r.x, &r.y, x, y);
+	SDL_RenderDrawRect(r_rend, &r);
+}

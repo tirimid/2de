@@ -8,7 +8,6 @@
 
 // system dependencies.
 #include <SDL.h>
-#include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <sys/time.h>
 #include <ztgl.h>
@@ -50,13 +49,6 @@ main(int argc, char *argv[])
 	}
 	atexit(SDL_Quit);
 	
-	if (IMG_Init(O_IMGFLAGS) != O_IMGFLAGS)
-	{
-		z_err("main: failed to init SDL2 image!");
-		return 1;
-	}
-	atexit(IMG_Quit);
-	
 	if (TTF_Init())
 	{
 		z_err("main: failed to init SDL TTF!");
@@ -66,6 +58,11 @@ main(int argc, char *argv[])
 	
 	// initialize program systems.
 	if (r_init())
+	{
+		return 1;
+	}
+	
+	if (m_init())
 	{
 		return 1;
 	}

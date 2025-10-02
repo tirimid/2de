@@ -3,7 +3,7 @@
 INCLUDE="-I. -Isrc -Idep"
 DEFINES="-DZ_IMPLEMENTATION"
 WARNINGS="-Wall -Wextra -Wshadow"
-LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf) -lm"
+LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_ttf) -lm"
 CFLAGS="-std=c99 -pedantic -O3 -D_GNU_SOURCE"
 
 CC=gcc

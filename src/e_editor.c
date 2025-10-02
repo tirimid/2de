@@ -38,13 +38,13 @@ e_main(void)
 		z_ui_t u = z_beginui(
 			ubuf,
 			sizeof(ubuf) / sizeof(ubuf[0]),
-			O_UIPAD,
-			O_UIPAD,
+			10,
+			10,
 			r_fonts[O_UIFONT],
 			r_wnd
 		);
 		
-		z_uilabel(&u, "[2de]");
+		z_uilabel(&u, "[Tirimid's 2de]");
 		
 		u.y += 20;
 		z_uilabel(&u, "File");
@@ -145,8 +145,25 @@ e_main(void)
 		// render.
 		SDL_SetRenderDrawColor(r_rend, O_BGCOLOR);
 		SDL_RenderClear(r_rend);
+		
+		m_renderoutlines();
 		m_render();
+		
 		z_renderui(&u);
+		
+		if (e_editor.unsaved)
+		{
+			SDL_SetRenderDrawColor(r_rend, O_UNSAVEDCOLOR);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(r_rend, O_SAVEDCOLOR);
+		}
+		i32 wndw, wndh;
+		SDL_GetWindowSize(r_wnd, &wndw, &wndh);
+		SDL_Rect r = {0, wndh - O_SAVEBAR, wndw, O_SAVEBAR};
+		SDL_RenderFillRect(r_rend, &r);
+		
 		SDL_RenderPresent(r_rend);
 		
 		z_endtick();
