@@ -20,3 +20,13 @@
 #define O_UIPAD 5
 #define O_UITEXTFIELDBAR 2
 #define O_BGCOLOR 80, 80, 80, 255
+
+typedef struct o_opt
+{
+	SDL_Keycode kup, kright, kdown, kleft;
+	SDL_Keycode kpencil, kbucket, keyedrop, ksel, kboxsel, kcopy, kpaste;
+} o_opt_t;
+
+void o_default(void);
+i32 o_read(void);
+i32 o_write(void);

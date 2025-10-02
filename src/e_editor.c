@@ -6,6 +6,11 @@ e_editor_t e_editor =
 	{
 		.buf = e_editor.file,
 		.cap = sizeof(e_editor.file)
+	},
+	.tilenumtf =
+	{
+		.buf = e_editor.tilenum,
+		.cap = sizeof(e_editor.tilenum)
 	}
 };
 
@@ -76,6 +81,8 @@ e_main(void)
 		u.y += 10;
 		if (e_editor.sys == E_TILEMAP)
 		{
+			z_uitextfield(&u, "Tile number", &e_editor.tilenumtf, 16);
+			
 			i32 sx = u.x;
 			
 			u.horizontal = true;

@@ -16,6 +16,8 @@ typedef struct e_editor
 	// editor panel elements.
 	char file[256];
 	z_tfdata_t filetf;
+	char tilenum[8];
+	z_tfdata_t tilenumtf;
 } e_editor_t;
 
 extern e_editor_t e_editor;
