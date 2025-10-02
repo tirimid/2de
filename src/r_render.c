@@ -6,7 +6,7 @@ TTF_Font *r_fonts[R_FONT_END];
 
 static resdata_t r_fontres[R_FONT_END] =
 {
-	INCRES(vcr_osd_mono_ttf)
+	Z_INCRES(vcr_osd_mono_ttf)
 };
 
 i32
@@ -22,14 +22,14 @@ r_init(void)
 	);
 	if (!r_wnd)
 	{
-		showerr("render: failed to create window - %s!", SDL_GetError());
+		z_err("render: failed to create window - %s!", SDL_GetError());
 		return 1;
 	}
 	
 	r_rend = SDL_CreateRenderer(r_wnd, -1, O_RENDFLAGS);
 	if (!r_rend)
 	{
-		showerr("render: failed to create renderer - %s!", SDL_GetError());
+		z_err("render: failed to create renderer - %s!", SDL_GetError());
 		return 1;
 	}
 	
@@ -39,14 +39,14 @@ r_init(void)
 		SDL_RWops *rwops = SDL_RWFromConstMem(r_fontres[i].data, *r_fontres[i].size);
 		if (!rwops)
 		{
-			showerr("render: failed to create font RWops - %s!", SDL_GetError());
+			z_err("render: failed to create font RWops - %s!", SDL_GetError());
 			return 1;
 		}
 		
 		r_fonts[i] = TTF_OpenFontRW(rwops, 1, O_FONTSIZE);
 		if (!r_fonts[i])
 		{
-			showerr("render: failed to open font - %s!", TTF_GetError());
+			z_err("render: failed to open font - %s!", TTF_GetError());
 			return 1;
 		}
 	}
@@ -78,4 +78,36 @@ r_rendertext(r_font_t font, char const *text, u8 r, u8 g, u8 b, u8 a)
 	}
 	
 	return tex;
+}
+
+void
+r_zrenderrect(i32 x, i32 y, i32 w, i32 h, z_color_t col)
+{
+	SDL_SetRenderDrawColor(
+		r_rend,
+		z_defaultcolors[col][0],
+		z_defaultcolors[col][1],
+		z_defaultcolors[col][2],
+		z_defaultcolors[col][3]
+	);
+	
+	SDL_Rect r = {x, y, w, h};
+	SDL_RenderFillRect(r_rend, &r);
+}
+
+void
+r_zrendertext(i32 x, i32 y, i32 w, i32 h, char const *text, z_color_t col)
+{
+	SDL_Texture *tex = r_rendertext(
+		O_UIFONT,
+		text,
+		z_defaultcolors[col][0],
+		z_defaultcolors[col][1],
+		z_defaultcolors[col][2],
+		z_defaultcolors[col][3]
+	);
+	
+	SDL_Rect r = {x, y, w, h};
+	SDL_RenderCopy(r_rend, tex, NULL, &r);
+	SDL_DestroyTexture(tex);
 }

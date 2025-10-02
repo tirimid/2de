@@ -1,10 +1,10 @@
 #!/bin/bash
 
-INCLUDE="-I. -Isrc"
-DEFINES=""
+INCLUDE="-I. -Isrc -Idep"
+DEFINES="-DZ_IMPLEMENTATION"
 WARNINGS="-Wall -Wextra -Wshadow"
-LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf)"
-CFLAGS="-std=c99 -pedantic -O3 -D_GNU_SOURCE"
+LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf) -lm"
+CFLAGS="-std=c99 -pedantic -Og -g3 -fsanitize=address -D_GNU_SOURCE"
 
 CC=gcc
 CFLAGS_FULL="$INCLUDE $DEFINES $WARNINGS $CFLAGS $LIBRARIES"

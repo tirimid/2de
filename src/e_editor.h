@@ -12,6 +12,10 @@ typedef struct e_editor
 	f32 camx, camy;
 	f32 camzoom;
 	e_system_t sys;
+	
+	// editor panel elements.
+	char file[256];
+	z_tfdata_t filetf;
 } e_editor_t;
 
 extern e_editor_t e_editor;
