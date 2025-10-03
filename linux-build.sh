@@ -1,16 +1,16 @@
 #!/bin/bash
 
 INCLUDE="-I. -Isrc -Idep"
-DEFINES="-DZ_IMPLEMENTATION"
+DEFINES="-DZTGL_IMPLEMENTATION"
 WARNINGS="-Wall -Wextra -Wshadow"
 LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_ttf) -lm"
-CFLAGS="-std=c99 -pedantic -O3 -D_GNU_SOURCE"
+FLAGS="-std=c++20 -pedantic -D_GNU_SOURCE -fno-rtti -fno-exceptions"
 
-CC=gcc
-CFLAGS_FULL="$INCLUDE $DEFINES $WARNINGS $CFLAGS $LIBRARIES"
+CPP=g++
+FULLFLAGS="$INCLUDE $DEFINES $WARNINGS $FLAGS $LIBRARIES"
 
 echo "[$0] build: compilation" >&2
-$CC -o 2de resources.o src/main.c $CFLAGS_FULL
+$CPP -o 2de resources.o src/main.cc $FULLFLAGS
 if [ $? -ne 0 ]
 then
 	echo "[$0] build: failed to compile!" >&2

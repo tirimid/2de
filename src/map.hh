@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#define M_MAGIC "[2de]MAG"
-#define M_VERSION 1
+#define MAP_MAGIC "[2de]MAG"
+#define MAP_VERSION 1
 
-#define M_MAXWIDTH 65535
-#define M_MAXHEIGHT 65535
-#define M_MAXREGIONS 65535
-#define M_MAXATTRS 65535
-#define M_MAXATTRLISTS 65534 // -1 because attribute lists are 1-indexed.
+#define MAX_MAP_WIDTH 65535
+#define MAX_MAP_HEIGHT 65535
+#define MAX_MAP_REGIONS 65535
+#define MAX_MAP_ATTRS 65535
+#define MAX_MAP_ATTR_LISTS 65534 // -1 because attribute lists are 1-indexed.
 
 // map file structure; start to end, data is packed.
 //
@@ -48,61 +48,68 @@
 // * A = number of attributes
 // * L = number of attribute lists
 
-typedef enum m_attrtype
+namespace Map
 {
-	M_INT = 0,
-	M_FLOAT,
-	M_STR,
-	M_BOOL
-} m_attrtype_t;
 
-typedef struct m_attrname
+enum AttrType
 {
-	char name[16];
-} m_attrname_t;
+	INT = 0,
+	FLOAT,
+	STR,
+	BOOL
+};
 
-typedef union m_attrval
+struct AttrName
 {
-	i64 i;
-	f64 f;
-	char s[16];
-	bool b;
-} m_attrval_t;
+	char m_Name[16];
+};
 
-typedef struct m_attrlist
+union AttrValue
 {
-	u16 attrs[16];
-} m_attrlist_t;
+	i64 m_Int;
+	f64 m_Float;
+	char m_String[16];
+	bool m_Bool;
+};
 
-typedef struct m_map
+struct AttrList
 {
-	u16 w, h;
-	u16 nregs;
-	u16 nattrs;
-	u16 nattrlists;
-	
-	void *buf;
-	
-	u8 *tiletypes;
-	u16 *tileattrlists;
-	
-	u8 *regtypes;
-	f32 *regxs, *regys;
-	f32 *regws, *reghs;
-	u16 *regattrlists;
-	
-	u8 *attrtypes;
-	m_attrname_t *attrnames;
-	m_attrval_t *attrvals;
-	
-	u8 *attrlistlens;
-	m_attrlist_t *attrlists;
-} m_map_t;
+	u16 m_Attrs[16];
+};
 
-extern m_map_t m_map;
+struct Map
+{
+	u16   m_W{};
+	u16   m_H{};
+	u16   m_NRegions{};
+	u16   m_NAttrs{};
+	u16   m_NAttrLists{};
+	
+	void* m_Buffer{};
+	
+	u8*   m_TileTypes{};
+	u16*  m_TileAttrLists{};
+	
+	u8*   m_RegionTypes{};
+	f32*  m_RegionXs{};
+	f32*  m_RegionYs{};
+	f32*  m_RegionWs{};
+	f32*  m_RegionHs{};
+	u16*  m_RegionAttrLists{};
+	
+	u8*   m_AttrTypes{};
+	AttrName*  m_AttrNames{};
+	AttrValue* m_AttrValues{};
+	
+	u8*   m_AttrListLengths{};
+	AttrList*  m_AttrLists{};
+	
+	static i32 New(OUT Map& map);
+	static i32 Read(OUT Map& map, FILE* file);
+	
+	i32  Write(FILE* file);
+	void Render();
+	void RenderOutlines();
+};
 
-i32 m_init(void);
-i32 m_read(FILE *fp);
-i32 m_write(FILE *fp);
-void m_render(void);
-void m_renderoutlines(void);
+}

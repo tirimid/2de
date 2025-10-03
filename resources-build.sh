@@ -4,10 +4,10 @@ INCLUDE="-I."
 DEFINES=""
 WARNING="-Wall -Wextra -Wshadow"
 LIBRARIES=""
-CFLAGS="-std=c99 -pedantic"
+FLAGS="-std=c++20 -pedantic -fno-rtti -fno-exceptions"
 
-CC=gcc
-CFLAGS_FULL="$INCLUDE $DEFINES $WARNINGS $CFLAGS $LIBRARIES"
+CPP=g++
+FULLFLAGS="$INCLUDE $DEFINES $WARNINGS $FLAGS $LIBRARIES"
 
 echo "[$0] resources: make fonts" >&2
 make -B -s -C font > /dev/null
@@ -18,7 +18,7 @@ then
 fi
 
 echo "[$0] resources: compilation" >&2
-$CC -o resources.o -c src/resources.c $CFLAGS_FULL
+$CPP -o resources.o -c src/resources.cc $FULLFLAGS
 if [ $? -ne 0 ]
 then
 	echo "[$0] resources: failed to compile!" >&2
