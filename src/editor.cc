@@ -4,23 +4,23 @@ namespace Editor
 {
 
 
-f32    camX;
-f32    camY;
-f32    camZoom = CAM_ZOOM_MAX;
-System system;
+f32		camX;
+f32		camY;
+f32		camZoom	= CAM_ZOOM_MAX;
+System	system;
 
-bool   unsaved;
-char   file[256];
-char   tileNum[8];
-ZTGL::TFData fileTF;
-ZTGL::TFData tileNumTF;
+bool				unsaved;
+char				file[256];
+char				tileNum[8];
+ZTGL::TFData	fileTF;
+ZTGL::TFData	tileNumTF;
 
-Map::Map map;
+Map::Map	map;
 
-static void UpdateUI(ZTGL::UIPanel& u);
-static void UpdateKeyboard();
-static void UpdateMouse();
-static void DrawIndicators();
+static void	UpdateUI(ZTGL::UIPanel& u);
+static void	UpdateKeyboard();
+static void	UpdateMouse();
+static void	DrawIndicators();
 
 i32
 Init()
@@ -30,10 +30,11 @@ Init()
 	
 	if (Map::Map::New(map))
 	{
-		return 1;
+		return (1);
 	}
+	map.Grow(3, 4);
 	
-	return 0;
+	return (0);
 }
 
 void
@@ -45,7 +46,7 @@ Main()
 		
 		// handle events.
 		ZTGL::PrepareInput();
-		SDL_Event event{};
+		SDL_Event	event	{};
 		while (SDL_PollEvent(&event))
 		{
 			ZTGL::HandleInput(event);
@@ -56,10 +57,10 @@ Main()
 		}
 		
 		// update.
-		ZTGL::UIElem uBuffer[64]{};
-		ZTGL::UIPanel u{
+		ZTGL::UIElem	uBuffer[64]{};
+		ZTGL::UIPanel	u	{
 			uBuffer,
-			sizeof(uBuffer) / sizeof(uBuffer[0]),
+			ARRAY_SIZE(uBuffer),
 			Render::font,
 			Render::window
 		};
@@ -76,6 +77,7 @@ Main()
 		map.Render();
 		
 		u.Render();
+		DrawIndicators();
 		
 		if (unsaved)
 		{
@@ -86,11 +88,11 @@ Main()
 			SDL_SetRenderDrawColor(Render::renderer, SAVED_COLOR);
 		}
 		
-		i32 windowWidth;
-		i32 windowHeight;
+		i32	windowWidth		{};
+		i32	windowHeight	{};
 		SDL_GetWindowSize(Render::window, &windowWidth, &windowHeight);
 		
-		SDL_Rect r{0, windowHeight - SAVE_BAR, windowWidth, SAVE_BAR};
+		SDL_Rect	r	{0, windowHeight - SAVE_BAR, windowWidth, SAVE_BAR};
 		SDL_RenderFillRect(Render::renderer, &r);
 		
 		SDL_RenderPresent(Render::renderer);
@@ -144,7 +146,7 @@ UpdateUI(ZTGL::UIPanel& u)
 	{
 		u.TextField("Tile number", tileNumTF, 16);
 		
-		i32 initialX = u.m_X;
+		i32	initialX	= u.m_X;
 		
 		if (u.Button("Pencil"))
 		{
@@ -185,20 +187,19 @@ UpdateUI(ZTGL::UIPanel& u)
 static void
 UpdateKeyboard()
 {
-	f32 camSpeed = ZTGL::ShiftDown() ? CAM_SPEED_FAST : CAM_SPEED_BASE;
-	f32 camMoveX = ZTGL::KeyDown(Options::right) - ZTGL::KeyDown(Options::left);
-	f32 camMoveY = ZTGL::KeyDown(Options::down) - ZTGL::KeyDown(Options::up);
+	f32	camSpeed	= ZTGL::ShiftDown() ? CAM_SPEED_FAST : CAM_SPEED_BASE;
+	f32	camMoveX	= ZTGL::KeyDown(Options::right) - ZTGL::KeyDown(Options::left);
+	f32	camMoveY	= ZTGL::KeyDown(Options::down) - ZTGL::KeyDown(Options::up);
 	camMoveX *= camSpeed;
 	camMoveY *= camSpeed;
 	
-	f32 camMoveZoom = ZTGL::KeyDown(Options::zoomIn) - ZTGL::KeyDown(Options::zoomOut);
+	f32	camMoveZoom	= ZTGL::KeyDown(Options::zoomIn) - ZTGL::KeyDown(Options::zoomOut);
 	camMoveZoom *= CAM_ZOOM_SPEED;
 	
 	camX += camMoveX;
 	camY += camMoveY;
 	camZoom += camMoveZoom;
-	camZoom = camZoom < CAM_ZOOM_MIN ? CAM_ZOOM_MIN : camZoom;
-	camZoom = camZoom > CAM_ZOOM_MAX ? CAM_ZOOM_MAX : camZoom;
+	camZoom = CLAMP(CAM_ZOOM_MIN, camZoom, CAM_ZOOM_MAX);
 }
 
 static void
