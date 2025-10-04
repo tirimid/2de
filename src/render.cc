@@ -5,12 +5,9 @@ namespace Render
 
 SDL_Window* window;
 SDL_Renderer* renderer;
-TTF_Font* fonts[FONT_END];
+TTF_Font* font;
 
-static ZTGL::Res fontResources[FONT_END] =
-{
-	ZTGL_INC_RES(vcr_osd_mono_ttf)
-};
+static ZTGL::Res fontResource = ZTGL_INC_RES(vcr_osd_mono_ttf);
 
 i32
 Init(void)
@@ -36,86 +33,28 @@ Init(void)
 		return 1;
 	}
 	
-	// set up fonts.
-	for (usize i = 0; i < FONT_END; ++i)
+	// set up font.
+	SDL_RWops *rwOps = SDL_RWFromConstMem(
+		fontResource.m_Data,
+		fontResource.m_Size
+	);
+	if (!rwOps)
 	{
-		SDL_RWops *rwOps = SDL_RWFromConstMem(
-			fontResources[i].m_Data,
-			fontResources[i].m_Size
-		);
-		if (!rwOps)
-		{
-			ZTGL::Error("render: failed to create font RWops - %s!", SDL_GetError());
-			return 1;
-		}
-		
-		fonts[i] = TTF_OpenFontRW(rwOps, 1, FONT_SIZE);
-		if (!fonts[i])
-		{
-			ZTGL::Error("render: failed to open font - %s!", TTF_GetError());
-			return 1;
-		}
+		ZTGL::Error("render: failed to create font RWops - %s!", SDL_GetError());
+		return 1;
+	}
+	
+	font = TTF_OpenFontRW(rwOps, 1, FONT_SIZE);
+	if (!font)
+	{
+		ZTGL::Error("render: failed to open font - %s!", TTF_GetError());
+		return 1;
 	}
 	
 	// set initial state.
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	
 	return 0;
-}
-
-SDL_Texture*
-RenderText(Font font, char const* text, u8 r, u8 g, u8 b, u8 a)
-{
-	SDL_Surface* surface = TTF_RenderUTF8_Solid(
-		fonts[font],
-		text,
-		SDL_Color{r, g, b, a}
-	);
-	if (!surface)
-	{
-		return nullptr;
-	}
-	
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_FreeSurface(surface);
-	if (!texture)
-	{
-		return nullptr;
-	}
-	
-	return texture;
-}
-
-void
-RenderRectZTGL(i32 x, i32 y, i32 w, i32 h, ZTGL::Color color)
-{
-	SDL_SetRenderDrawColor(
-		renderer,
-		ZTGL::defaultColors[color][0],
-		ZTGL::defaultColors[color][1],
-		ZTGL::defaultColors[color][2],
-		ZTGL::defaultColors[color][3]
-	);
-	
-	SDL_Rect r{x, y, w, h};
-	SDL_RenderFillRect(renderer, &r);
-}
-
-void
-RenderTextZTGL(i32 x, i32 y, i32 w, i32 h, char const* text, ZTGL::Color color)
-{
-	SDL_Texture* texture = RenderText(
-		UI_FONT,
-		text,
-		ZTGL::defaultColors[color][0],
-		ZTGL::defaultColors[color][1],
-		ZTGL::defaultColors[color][2],
-		ZTGL::defaultColors[color][3]
-	);
-	
-	SDL_Rect r{x, y, w, h};
-	SDL_RenderCopy(renderer, texture, nullptr, &r);
-	SDL_DestroyTexture(texture);
 }
 
 void

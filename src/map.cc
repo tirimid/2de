@@ -301,7 +301,14 @@ Map::Render()
 void
 Map::RenderOutlines()
 {
-	// TODO: implement map render outlines.
+	SDL_SetRenderDrawColor(Render::renderer, OUTLINE_COLOR);
+	for (u32 x = 0; x < m_W; ++x)
+	{
+		for (u32 y = 0; y < m_H; ++y)
+		{
+			Render::RenderHollowRectRel(x, y, 1.0f, 1.0f);
+		}
+	}
 }
 
 }

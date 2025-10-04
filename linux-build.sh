@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INCLUDE="-I. -Isrc -Idep"
-DEFINES="-DZTGL_IMPLEMENTATION"
+DEFINES="-DZTGL_IMPLEMENTATION -DZTGL_SDL2_RENDERER"
 WARNINGS="-Wall -Wextra -Wshadow"
 LIBRARIES="$(pkg-config --cflags --libs sdl2 SDL2_ttf) -lm"
 FLAGS="-std=c++20 -pedantic -D_GNU_SOURCE -fno-rtti -fno-exceptions"

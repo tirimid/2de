@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <filesystem>
+#include <string>
 
 // system dependencies.
 #include <ztgl.hh>
@@ -18,6 +20,7 @@
 // project source.
 #include "editor.cc"
 #include "map.cc"
+#include "options.cc"
 #include "render.cc"
 
 int
@@ -26,14 +29,13 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 	
-	// initialize external systems.
 	ZTGL::conf.m_Log = stderr;
 	ZTGL::conf.m_ErrorTitle = ERROR_WINDOW_TITLE;
 	ZTGL::conf.m_TickMicro = TICK_MICRO;
 	ZTGL::conf.m_UIPad = UI_PAD;
 	ZTGL::conf.m_UITextFieldBar = UI_TEXT_FIELD_BAR;
-	ZTGL::conf.m_RenderRect = Render::RenderRectZTGL;
-	ZTGL::conf.m_RenderText = Render::RenderTextZTGL;
+	ZTGL::conf.m_RenderRect = ZTGL::Platform::RenderRect;
+	ZTGL::conf.m_RenderText = ZTGL::Platform::RenderText;
 	
 	if (SDL_Init(SDL_FLAGS))
 	{
@@ -49,11 +51,19 @@ main(int argc, char *argv[])
 	}
 	atexit(TTF_Quit);
 	
-	// initialize program systems.
+	if (Options::Read())
+	{
+		Options::Default();
+		Options::Write();
+	}
+	
 	if (Render::Init())
 	{
 		return 1;
 	}
+	
+	ZTGL::platformConf.m_Renderer = Render::renderer;
+	ZTGL::platformConf.m_Font = Render::font;
 	
 	if (Editor::Init())
 	{

@@ -17,8 +17,8 @@ extern "C"
 //--------------------------//
 
 #define ZTGL_VER_MAJOR 1
-#define ZTGL_VER_MINOR 0
-#define ZTGL_VER_PATCH 3
+#define ZTGL_VER_MINOR 2
+#define ZTGL_VER_PATCH 0
 
 //--------//
 // macros //
@@ -152,6 +152,16 @@ struct Conf
 	void (*m_RenderText)(i32, i32, i32, i32, char const*, Color);
 };
 
+struct PlatformConf
+{
+#ifdef ZTGL_SDL2_RENDERER
+	SDL_Renderer* m_Renderer;
+	TTF_Font*     m_Font;
+#else
+	i32 m_Ignore; // struct cannot be empty.
+#endif
+};
+
 struct Res
 {
 	u8*  m_Data;
@@ -282,7 +292,8 @@ struct UIPanel
 // library configuration //
 //-----------------------//
 
-extern Conf conf; // must be initialized prior to use.
+extern Conf conf; // initialize before using library.
+extern PlatformConf platformConf; // initialize before using platform functions.
 
 //-------------//
 // data tables //
@@ -305,6 +316,7 @@ bool MouseDown(i32 button);
 bool MousePressed(i32 button);
 bool MouseReleased(i32 button);
 bool TextInput(char c);
+bool ShiftDown();
 
 // options.
 ErrorCode OptionRaw(OUT char data[], FILE* file, char const* key);
@@ -328,6 +340,18 @@ void* AllocBatch(IN_OUT AllocBatchDesc allocs[], usize nAllocs);
 void* ReallocBatch(void* p, IN_OUT ReallocBatchDesc reallocs[], usize nReallocs);
 u64   Align(u64 addr, u64 align);
 
+//------------------------------------------//
+// standalone platform-dependent procedures //
+//------------------------------------------//
+
+namespace Platform
+{
+
+void RenderRect(i32 x, i32 y, i32 w, i32 h, Color color);
+void RenderText(i32 x, i32 y, i32 w, i32 h, char const* text, Color color);
+
+}
+
 }
 
 #endif
@@ -349,7 +373,10 @@ extern "C"
 #include <sys/time.h>
 }
 
-namespace ZTGL::Internal
+namespace ZTGL
+{
+
+namespace Internal
 {
 
 enum UIFlag
@@ -380,10 +407,8 @@ u64 tickStart;
 
 }
 
-namespace ZTGL
-{
-
 Conf conf;
+PlatformConf platformConf;
 
 u8 defaultColors[][4] =
 {
@@ -577,6 +602,13 @@ TextInput(char c)
 	usize byte = c / 8;
 	usize bit = c % 8;
 	return Internal::textInputStates[byte] & 1 << bit;
+}
+
+bool
+ShiftDown()
+{
+	SDL_Keymod modState = SDL_GetModState();
+	return modState & KMOD_LSHIFT || modState & KMOD_RSHIFT;
 }
 
 //---------//
@@ -1409,6 +1441,75 @@ u64
 Align(u64 addr, u64 align)
 {
 	return addr + align - addr % align;
+}
+
+//-------------------------------//
+// platform-dependent procedures //
+//-------------------------------//
+
+namespace Platform
+{
+
+#ifdef ZTGL_SDL2_RENDERER
+void
+RenderRect(i32 x, i32 y, i32 w, i32 h, Color color)
+{
+	SDL_SetRenderDrawColor(
+		platformConf.m_Renderer,
+		defaultColors[color][0],
+		defaultColors[color][1],
+		defaultColors[color][2],
+		defaultColors[color][3]
+	);
+	
+	SDL_Rect r{x, y, w, h};
+	SDL_RenderFillRect(platformConf.m_Renderer, &r);
+}
+#else
+void
+RenderRect(i32 x, i32 y, i32 w, i32 h, Color color)
+{
+}
+#endif
+
+#ifdef ZTGL_SDL2_RENDERER
+void
+RenderText(i32 x, i32 y, i32 w, i32 h, char const* text, Color color)
+{
+	SDL_Color rgba{
+		defaultColors[color][0],
+		defaultColors[color][1],
+		defaultColors[color][2],
+		defaultColors[color][3]
+	};
+	
+	SDL_Surface* surface = TTF_RenderUTF8_Solid(platformConf.m_Font, text, rgba);
+	if (!surface)
+	{
+		return;
+	}
+	
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(
+		platformConf.m_Renderer,
+		surface
+	);
+	SDL_FreeSurface(surface);
+	if (!texture)
+	{
+		return;
+	}
+	
+	SDL_Rect r{x, y, w, h};
+	SDL_RenderCopy(platformConf.m_Renderer, texture, nullptr, &r);
+	SDL_DestroyTexture(texture);
+}
+#else
+void
+RenderText(i32 x, i32 y, i32 w, i32 h, char const* text, Color color)
+{
+}
+#endif
+
 }
 
 }
