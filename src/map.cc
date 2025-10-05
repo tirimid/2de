@@ -287,9 +287,13 @@ Map::Render()
 	maxX = MIN((u32)maxX + 1, m_W);
 	maxY = MIN((u32)maxY + 1, m_H);
 	
-	for (u32 x = minX; x < (u32)maxX; ++x)
+	for (u32 x	=	minX;
+		x < (u32)maxX;
+		++x)
 	{
-		for (u32 y = minY; y < (u32)maxY; ++y)
+		for (u32	y	= minY;
+			y < (u32)maxY;
+			++y)
 		{
 			u8	type	= m_TileTypes[y * m_W + x];
 			if (!type)
@@ -329,9 +333,13 @@ Map::RenderOutlines()
 	maxY = MIN((u32)maxY + 1, m_H);
 	
 	SDL_SetRenderDrawColor(Render::renderer, OUTLINE_COLOR);
-	for (u32 x = 0; x < (u32)maxX; ++x)
+	for (u32	x	= 0;
+		x < (u32)maxX;
+		++x)
 	{
-		for (u32 y = 0; y < (u32)maxY; ++y)
+		for (u32	y	= 0;
+			y < (u32)maxY;
+			++y)
 		{
 			Render::RenderHollowRectRel(x, y, 1.0f, 1.0f);
 		}
@@ -403,7 +411,9 @@ void
 Init()
 {
 	srand(0);
-	for (usize i = 0; i < ARRAY_SIZE(tileColors); ++i)
+	for (usize	i	= 0;
+		i < ARRAY_SIZE(tileColors);
+		++i)
 	{
 		tileColors[i][0]	= rand() % 256;
 		tileColors[i][1]	= rand() % 256;

@@ -51,9 +51,9 @@
 namespace Map
 {
 
-enum AttrType
+enum AttrType : u8
 {
-	INT = 0,
+	INT	= 0,
 	FLOAT,
 	STR,
 	BOOL

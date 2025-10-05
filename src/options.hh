@@ -22,10 +22,11 @@
 #define	UI_TEXT_FIELD_BAR	2
 #define	DRAW_SCALE			50
 #define	SAVE_BAR				10
-#define	BG_COLOR				80, 80, 80, 255
-#define	SAVED_COLOR			0, 255, 0, 255
-#define	UNSAVED_COLOR		255, 0, 0, 255
-#define	OUTLINE_COLOR		0, 0, 0, 255
+#define	BG_COLOR				80,	80,	80,	255
+#define	SAVED_COLOR			0,		255,	0,		255
+#define	UNSAVED_COLOR		255,	0,		0,		255
+#define	OUTLINE_COLOR		0,		0,		0,		255
+#define	INDICATOR_COLOR	0,		255,	0,		90
 #define	CAM_ZOOM_MAX		1.2f
 #define	CAM_ZOOM_MIN		0.2f
 #define	COLOR_SEED			0
@@ -33,6 +34,7 @@
 namespace Options
 {
 
+extern SDL_Keycode	menu;
 extern SDL_Keycode	up;
 extern SDL_Keycode	right;
 extern SDL_Keycode	down;
@@ -50,4 +52,4 @@ i32							Read();
 i32							Write();
 std::filesystem::path	Path();
 
-};
+}

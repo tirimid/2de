@@ -3,6 +3,7 @@
 namespace Options
 {
 
+SDL_Keycode	menu;
 SDL_Keycode	up;
 SDL_Keycode	right;
 SDL_Keycode	down;
@@ -18,6 +19,7 @@ SDL_Keycode	boxSelect;
 void
 Default()
 {
+	menu			= SDLK_m;
 	up				= SDLK_w;
 	right			= SDLK_d;
 	down			= SDLK_s;
@@ -43,7 +45,8 @@ Read()
 		return (1);
 	}
 	
-	if (ZTGL::OptionKeycode(up, file, "up")
+	if (ZTGL::OptionKeycode(menu, file, "menu")
+		|| ZTGL::OptionKeycode(up, file, "up")
 		|| ZTGL::OptionKeycode(right, file, "right")
 		|| ZTGL::OptionKeycode(down, file, "down")
 		|| ZTGL::OptionKeycode(left, file, "left")
@@ -75,6 +78,7 @@ Write()
 		return (1);
 	}
 	
+	std::string	menuName			= SDL_GetKeyName(menu);
 	std::string	upName			= SDL_GetKeyName(up);
 	std::string	rightName		= SDL_GetKeyName(right);
 	std::string	downName			= SDL_GetKeyName(down);
@@ -89,6 +93,7 @@ Write()
 	
 	fprintf(
 		file,
+		"menu = %s\n"
 		"up = %s\n"
 		"right = %s\n"
 		"down = %s\n"
@@ -100,6 +105,7 @@ Write()
 		"eyeDropper = %s\n"
 		"select = %s\n"
 		"boxSelect = %s\n",
+		menuName.c_str(),
 		upName.c_str(),
 		rightName.c_str(),
 		downName.c_str(),

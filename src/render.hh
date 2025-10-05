@@ -13,4 +13,4 @@ void	GameToScreen(OUT i32& screenX, OUT i32& screenY, f32 gameX, f32 gameY);
 void	RenderRectRel(f32 x, f32 y, f32 w, f32 h);
 void	RenderHollowRectRel(f32 x, f32 y, f32 w, f32 h);
 
-};
+}
