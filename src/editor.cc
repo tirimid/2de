@@ -11,9 +11,9 @@ TilemapMode	tilemapMode;
 
 bool				menu;
 bool				unsaved;
-char				file[256];
+char				targetFile[256];
 char				tileNum[8];
-ZTGL::TFData	fileTF;
+ZTGL::TFData	targetFileTF;
 ZTGL::TFData	tileNumTF;
 
 Map::Map	map;
@@ -27,7 +27,7 @@ static void	DrawIndicators();
 i32
 Init()
 {
-	fileTF = ZTGL::TFData{file, sizeof(file)};
+	targetFileTF = ZTGL::TFData{targetFile, sizeof(targetFile)};
 	tileNumTF = ZTGL::TFData{tileNum, sizeof(tileNum)};
 	
 	if (Map::Map::New(map))
@@ -108,14 +108,35 @@ UpdateActiveUI(ZTGL::UIPanel& u)
 	u.m_Y += 20;
 	u.Label("File");
 	u.m_Y += 10;
-	u.TextField("Map file", fileTF, 16);
+	u.TextField("Map file", targetFileTF, 16);
 	if (u.Button("Open file"))
 	{
-		// TODO: implement.
+		FILE*	file	= fopen(targetFile, "rb");
+		if (!file)
+		{
+			ZTGL::Error("editor: failed to open file for reading - %s!", file);
+		}
+		else
+		{
+			Map::Map::Read(map, file);
+			fclose(file);
+			unsaved = false;
+		}
 	}
 	if (u.Button("Save file"))
 	{
-		// TODO: implement.
+		FILE*	file	= fopen(targetFile, "wb");
+		if (!file)
+		{
+			ZTGL::Error("editor: failed to open file for writing - %s!", file);
+		}
+		else
+		{
+			map.RefitBounds();
+			map.Write(file);
+			fclose(file);
+			unsaved = false;
+		}
 	}
 	if (u.Button("Export as header"))
 	{

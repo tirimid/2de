@@ -111,6 +111,7 @@ struct Map
 	void			Render();
 	void			RenderOutlines();
 	void			Grow(u32 dx, u32 dy);
+	void			RefitBounds();
 };
 
 void	Init();

@@ -264,8 +264,142 @@ Map::Read(OUT Map& map, FILE* file)
 i32
 Map::Write(FILE* file)
 {
-	// TODO: implement map write to file.
-	return (1);
+	if (fprintf(file, "%s", MAP_MAGIC) != 8)
+	{
+		ZTGL::Error("map: failed to write magic (header)!");
+		return (1);
+	}
+	
+	u8	version	= MAP_VERSION;
+	if (fwrite(&version, 1, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write version (header)!");
+		return (1);
+	}
+	
+	if (fwrite(&m_W, 2, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write map width!");
+		return (1);
+	}
+	
+	if (fwrite(&m_H, 2, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write map height!");
+		return (1);
+	}
+	
+	if (fwrite(&m_NRegions, 2, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write region count!");
+		return (1);
+	}
+	
+	if (fwrite(&m_NAttrs, 2, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write attribute count!");
+		return (1);
+	}
+	
+	if (fwrite(&m_NAttrLists, 2, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write attribute list count!");
+		return (1);
+	}
+	
+	u32	nTiles	= (u32)m_W * m_H;
+	
+	if (fwrite(&m_TileTypes, 1, nTiles, file) != nTiles)
+	{
+		ZTGL::Error("map: failed to write tile types!");
+		return (1);
+	}
+	
+	if (fwrite(&m_TileAttrLists, 2, nTiles, file) != nTiles)
+	{
+		ZTGL::Error("map: failed to write tile attribute lists!");
+		return (1);
+	}
+	
+	if (fwrite(&m_RegionTypes, 1, m_NRegions, file) != m_NRegions)
+	{
+		ZTGL::Error("map: failed to write region types!");
+		return (1);
+	}
+	
+	if (fwrite(&m_RegionXs, 4, m_NRegions, file) != m_NRegions)
+	{
+		ZTGL::Error("map: failed to write region X values!");
+		return (1);
+	}
+	
+	if (fwrite(&m_RegionYs, 4, m_NRegions, file) != m_NRegions)
+	{
+		ZTGL::Error("map: failed to write region Y values!");
+		return (1);
+	}
+	
+	if (fwrite(&m_RegionWs, 4, m_NRegions, file) != m_NRegions)
+	{
+		ZTGL::Error("map: failed to write region W values!");
+		return (1);
+	}
+	
+	if (fwrite(&m_RegionHs, 4, m_NRegions, file) != m_NRegions)
+	{
+		ZTGL::Error("map: failed to write region H values!");
+		return (1);
+	}
+	
+	if (fwrite(&m_RegionAttrLists, 2, m_NRegions, file) != m_NRegions)
+	{
+		ZTGL::Error("map: failed to write region attribute lists!");
+		return (1);
+	}
+	
+	if (fwrite(&m_AttrTypes, 1, m_NAttrs, file) != m_NAttrs)
+	{
+		ZTGL::Error("map: failed to write attribute types!");
+		return (1);
+	}
+	
+	if (fwrite(&m_AttrNames, 16, m_NAttrs, file) != m_NAttrs)
+	{
+		ZTGL::Error("map: failed to write attribute names!");
+		return (1);
+	}
+	
+	if (fwrite(&m_AttrValues, 16, m_NAttrs, file) != m_NAttrs)
+	{
+		ZTGL::Error("map: failed to write attribute values!");
+		return (1);
+	}
+	
+	if (fwrite(&m_AttrListLengths, 1, m_NAttrLists, file) != m_NAttrLists)
+	{
+		ZTGL::Error("map: failed to write attribute list lengths!");
+		return (1);
+	}
+	
+	if (fwrite(&m_AttrLists, 32, m_NAttrLists, file) != m_NAttrLists)
+	{
+		ZTGL::Error("map: failed to write attribute lists!");
+		return (1);
+	}
+	
+	if (fprintf(file, "%s", MAP_MAGIC) != 8)
+	{
+		ZTGL::Error("map: failed to write magic (trailer)!");
+		return (1);
+	}
+	
+	if (fwrite(&version, 1, 1, file) != 1)
+	{
+		ZTGL::Error("map: failed to write version (trailer)!");
+		return (1);
+	}
+	
+	return (0);
 }
 
 void
@@ -405,6 +539,12 @@ Map::Grow(u32 dx, u32 dy)
 	// create new empty cells (vertical).
 	memset(&m_TileTypes[m_W * oldHeight], 0, m_W * dy);
 	memset(&m_TileAttrLists[m_W * oldHeight], 0, 2 * m_W * dy);
+}
+
+void
+Map::RefitBounds()
+{
+	// TODO: implement map refit bounds.
 }
 
 void

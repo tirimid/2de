@@ -27,9 +27,9 @@ extern TilemapMode	tilemapMode;
 
 extern bool				menu;
 extern bool				unsaved;
-extern char				file[256];
+extern char				targetFile[256];
 extern char				tileNum[8];
-extern ZTGL::TFData	fileTF;
+extern ZTGL::TFData	targetFileTF;
 extern ZTGL::TFData	tileNumTF;
 
 extern Map::Map	map;
