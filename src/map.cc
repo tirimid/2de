@@ -53,7 +53,7 @@ Map::Read(OUT Map& map, FILE* file)
 		return (1);
 	}
 	
-	if (strcmp(magic, MAP_MAGIC))
+	if (strcmp(magic, MAGIC))
 	{
 		ZTGL::Error("map: invalid magic (header) - %s!", magic);
 		return (1);
@@ -66,7 +66,7 @@ Map::Read(OUT Map& map, FILE* file)
 		return (1);
 	}
 	
-	if (version != MAP_VERSION)
+	if (version != VERSION)
 	{
 		ZTGL::Error("map: unsupported version (header) - %u!", version);
 		return (1);
@@ -237,7 +237,7 @@ Map::Read(OUT Map& map, FILE* file)
 		return (1);
 	}
 	
-	if (strcmp(magic, MAP_MAGIC))
+	if (strcmp(magic, MAGIC))
 	{
 		ZTGL::Error("map: invalid magic (trailer) - %s!", magic);
 		free(map.m_Buffer);
@@ -251,7 +251,7 @@ Map::Read(OUT Map& map, FILE* file)
 		return (1);
 	}
 	
-	if (version != MAP_VERSION)
+	if (version != VERSION)
 	{
 		ZTGL::Error("map: unsupported version (trailer) - %u!", version);
 		free(map.m_Buffer);
@@ -264,13 +264,13 @@ Map::Read(OUT Map& map, FILE* file)
 i32
 Map::Write(FILE* file)
 {
-	if (fprintf(file, "%s", MAP_MAGIC) != 8)
+	if (fprintf(file, "%s", MAGIC) != 8)
 	{
 		ZTGL::Error("map: failed to write magic (header)!");
 		return (1);
 	}
 	
-	u8	version	= MAP_VERSION;
+	u8	version	= VERSION;
 	if (fwrite(&version, 1, 1, file) != 1)
 	{
 		ZTGL::Error("map: failed to write version (header)!");
@@ -309,85 +309,85 @@ Map::Write(FILE* file)
 	
 	u32	nTiles	= (u32)m_W * m_H;
 	
-	if (fwrite(&m_TileTypes, 1, nTiles, file) != nTiles)
+	if (fwrite(m_TileTypes, 1, nTiles, file) != nTiles)
 	{
 		ZTGL::Error("map: failed to write tile types!");
 		return (1);
 	}
 	
-	if (fwrite(&m_TileAttrLists, 2, nTiles, file) != nTiles)
+	if (fwrite(m_TileAttrLists, 2, nTiles, file) != nTiles)
 	{
 		ZTGL::Error("map: failed to write tile attribute lists!");
 		return (1);
 	}
 	
-	if (fwrite(&m_RegionTypes, 1, m_NRegions, file) != m_NRegions)
+	if (fwrite(m_RegionTypes, 1, m_NRegions, file) != m_NRegions)
 	{
 		ZTGL::Error("map: failed to write region types!");
 		return (1);
 	}
 	
-	if (fwrite(&m_RegionXs, 4, m_NRegions, file) != m_NRegions)
+	if (fwrite(m_RegionXs, 4, m_NRegions, file) != m_NRegions)
 	{
 		ZTGL::Error("map: failed to write region X values!");
 		return (1);
 	}
 	
-	if (fwrite(&m_RegionYs, 4, m_NRegions, file) != m_NRegions)
+	if (fwrite(m_RegionYs, 4, m_NRegions, file) != m_NRegions)
 	{
 		ZTGL::Error("map: failed to write region Y values!");
 		return (1);
 	}
 	
-	if (fwrite(&m_RegionWs, 4, m_NRegions, file) != m_NRegions)
+	if (fwrite(m_RegionWs, 4, m_NRegions, file) != m_NRegions)
 	{
 		ZTGL::Error("map: failed to write region W values!");
 		return (1);
 	}
 	
-	if (fwrite(&m_RegionHs, 4, m_NRegions, file) != m_NRegions)
+	if (fwrite(m_RegionHs, 4, m_NRegions, file) != m_NRegions)
 	{
 		ZTGL::Error("map: failed to write region H values!");
 		return (1);
 	}
 	
-	if (fwrite(&m_RegionAttrLists, 2, m_NRegions, file) != m_NRegions)
+	if (fwrite(m_RegionAttrLists, 2, m_NRegions, file) != m_NRegions)
 	{
 		ZTGL::Error("map: failed to write region attribute lists!");
 		return (1);
 	}
 	
-	if (fwrite(&m_AttrTypes, 1, m_NAttrs, file) != m_NAttrs)
+	if (fwrite(m_AttrTypes, 1, m_NAttrs, file) != m_NAttrs)
 	{
 		ZTGL::Error("map: failed to write attribute types!");
 		return (1);
 	}
 	
-	if (fwrite(&m_AttrNames, 16, m_NAttrs, file) != m_NAttrs)
+	if (fwrite(m_AttrNames, 16, m_NAttrs, file) != m_NAttrs)
 	{
 		ZTGL::Error("map: failed to write attribute names!");
 		return (1);
 	}
 	
-	if (fwrite(&m_AttrValues, 16, m_NAttrs, file) != m_NAttrs)
+	if (fwrite(m_AttrValues, 16, m_NAttrs, file) != m_NAttrs)
 	{
 		ZTGL::Error("map: failed to write attribute values!");
 		return (1);
 	}
 	
-	if (fwrite(&m_AttrListLengths, 1, m_NAttrLists, file) != m_NAttrLists)
+	if (fwrite(m_AttrListLengths, 1, m_NAttrLists, file) != m_NAttrLists)
 	{
 		ZTGL::Error("map: failed to write attribute list lengths!");
 		return (1);
 	}
 	
-	if (fwrite(&m_AttrLists, 32, m_NAttrLists, file) != m_NAttrLists)
+	if (fwrite(m_AttrLists, 32, m_NAttrLists, file) != m_NAttrLists)
 	{
 		ZTGL::Error("map: failed to write attribute lists!");
 		return (1);
 	}
 	
-	if (fprintf(file, "%s", MAP_MAGIC) != 8)
+	if (fprintf(file, "%s", MAGIC) != 8)
 	{
 		ZTGL::Error("map: failed to write magic (trailer)!");
 		return (1);
@@ -421,13 +421,9 @@ Map::Render()
 	maxX = MIN((u32)maxX + 1, m_W);
 	maxY = MIN((u32)maxY + 1, m_H);
 	
-	for (u32 x	=	minX;
-		x < (u32)maxX;
-		++x)
+	for (u32 x = minX; x < (u32)maxX; ++x)
 	{
-		for (u32	y	= minY;
-			y < (u32)maxY;
-			++y)
+		for (u32 y = minY; y < (u32)maxY; ++y)
 		{
 			u8	type	= m_TileTypes[y * m_W + x];
 			if (!type)
@@ -466,14 +462,16 @@ Map::RenderOutlines()
 	maxX = MIN((u32)maxX + 1, m_W);
 	maxY = MIN((u32)maxY + 1, m_H);
 	
-	SDL_SetRenderDrawColor(Render::renderer, OUTLINE_COLOR);
-	for (u32	x	= 0;
-		x < (u32)maxX;
-		++x)
+	SDL_SetRenderDrawColor(
+		Render::renderer,
+		Options::OUTLINE_COLOR.r,
+		Options::OUTLINE_COLOR.g,
+		Options::OUTLINE_COLOR.b,
+		Options::OUTLINE_COLOR.a
+	);
+	for (u32 x = 0; x < (u32)maxX; ++x)
 	{
-		for (u32	y	= 0;
-			y < (u32)maxY;
-			++y)
+		for (u32 y = 0; y < (u32)maxY; ++y)
 		{
 			Render::RenderHollowRectRel(x, y, 1.0f, 1.0f);
 		}
@@ -544,16 +542,79 @@ Map::Grow(u32 dx, u32 dy)
 void
 Map::RefitBounds()
 {
-	// TODO: implement map refit bounds.
+	// determine maximum bounds of map.
+	u32	farX	= 0;
+	u32	farY	= 0;
+	for (u32 x = 0; x < m_W; ++x)
+	{
+		for (u32 y = 0; y < m_H; ++y)
+		{
+			usize	cell	= y * m_W + x;
+			if (m_TileTypes[cell] || m_TileAttrLists[cell])
+			{
+				farX = MAX(farX, x);
+				farY = MAX(farY, y);
+			}
+		}
+	}
+	
+	if (farX + 1 < m_W)
+	{
+		// shrink horizontally and move memory.
+		usize	dx				= (u32)m_W - farX - 1;
+		usize	moveIndex	= m_W;
+		usize	moveLength	= (u32)m_W * (m_H - 1);
+		
+		while (moveLength > 0)
+		{
+			memmove(
+				&m_TileTypes[moveIndex - dx],
+				&m_TileTypes[moveIndex],
+				moveLength
+			);
+			memmove(
+				&m_TileAttrLists[moveIndex - dx],
+				&m_TileAttrLists[moveIndex],
+				2 * moveLength
+			);
+			
+			moveLength -= m_W;
+			moveIndex += farX + 1;
+		}
+		
+		// reallocate map memory.
+		usize	oldNTiles	= (u32)m_W * m_H;
+		usize	newNTiles	= ((u32)farX + 1) * (farY + 1);
+		
+		ZTGL::ReallocBatchDesc	reallocs[]	=
+		{
+			{(void**)&m_TileTypes,			oldNTiles,		newNTiles,		1},
+			{(void**)&m_TileAttrLists,		oldNTiles,		newNTiles,		2},
+			{(void**)&m_RegionTypes,		m_NRegions,		m_NRegions,		1},
+			{(void**)&m_RegionXs,			m_NRegions,		m_NRegions,		4},
+			{(void**)&m_RegionYs,			m_NRegions,		m_NRegions,		4},
+			{(void**)&m_RegionWs,			m_NRegions,		m_NRegions,		4},
+			{(void**)&m_RegionHs,			m_NRegions,		m_NRegions,		4},
+			{(void**)&m_RegionAttrLists,	m_NRegions,		m_NRegions,		2},
+			{(void**)&m_AttrTypes,			m_NAttrs,		m_NAttrs,		1},
+			{(void**)&m_AttrNames,			m_NAttrs,		m_NAttrs,		sizeof(AttrName)},
+			{(void**)&m_AttrValues,			m_NAttrs,		m_NAttrs,		sizeof(AttrValue)},
+			{(void**)&m_AttrListLengths,	m_NAttrLists,	m_NAttrLists,	1},
+			{(void**)&m_AttrLists,			m_NAttrLists,	m_NAttrLists,	sizeof(AttrList)}
+		};
+		m_Buffer = ZTGL::ReallocBatch(m_Buffer, reallocs, ARRAY_SIZE(reallocs));
+		
+		// resize map to minimum possible size.
+		m_W = farX + 1;
+		m_H = farY + 1;
+	}
 }
 
 void
 Init()
 {
 	srand(0);
-	for (usize	i	= 0;
-		i < ARRAY_SIZE(tileColors);
-		++i)
+	for (usize i = 0; i < ARRAY_SIZE(tileColors); ++i)
 	{
 		tileColors[i][0]	= rand() % 256;
 		tileColors[i][1]	= rand() % 256;

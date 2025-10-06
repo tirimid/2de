@@ -5,7 +5,7 @@ namespace Editor
 
 f32			camX;
 f32			camY;
-f32			camZoom	= CAM_ZOOM_MAX;
+f32			camZoom	= Options::CAM_ZOOM_MAX;
 System		system;
 TilemapMode	tilemapMode;
 
@@ -83,7 +83,13 @@ Main()
 		}
 		
 		// render.
-		SDL_SetRenderDrawColor(Render::renderer, BG_COLOR);
+		SDL_SetRenderDrawColor(
+			Render::renderer,
+			Options::BG_COLOR.r,
+			Options::BG_COLOR.g,
+			Options::BG_COLOR.b,
+			Options::BG_COLOR.a
+		);
 		SDL_RenderClear(Render::renderer);
 		
 		map.RenderOutlines();
@@ -100,10 +106,10 @@ Main()
 static void
 UpdateActiveUI(ZTGL::UIPanel& u)
 {
-	u.m_X = UI_PAD;
-	u.m_Y = UI_PAD;
+	u.m_X = Options::UI_PAD;
+	u.m_Y = Options::UI_PAD;
 	
-	u.Label("[Tirimid's 2de]");
+	u.Label("[2de]");
 	
 	u.m_Y += 20;
 	u.Label("File");
@@ -207,32 +213,35 @@ UpdateActiveUI(ZTGL::UIPanel& u)
 static void
 UpdateInactiveUI(ZTGL::UIPanel& u)
 {
-	u.m_X = UI_PAD;
-	u.m_Y = UI_PAD;
+	u.m_X = Options::UI_PAD;
+	u.m_Y = Options::UI_PAD;
 	
-	u.Label("[Tirimid's 2de]");
+	u.Label("[2de]");
 	
 	u.m_Y += 20;
-	u.Label("<placeholder text on how to toggle menu>");
+	
+	static char	text[64];
+	sprintf(text, "Press CTRL+%s to toggle menu", SDL_GetKeyName(Options::menu));
+	u.Label(text);
 }
 
 static void
 UpdateKeyboard()
 {
 	// handle universal behavior.
-	f32	camSpeed	= ZTGL::ShiftDown() ? CAM_SPEED_FAST : CAM_SPEED_BASE;
+	f32	camSpeed	= ZTGL::ShiftDown() ? Options::CAM_SPEED_FAST : Options::CAM_SPEED_BASE;
 	f32	camMoveX	= ZTGL::KeyDown(Options::right) - ZTGL::KeyDown(Options::left);
 	f32	camMoveY	= ZTGL::KeyDown(Options::down) - ZTGL::KeyDown(Options::up);
 	camMoveX *= camSpeed;
 	camMoveY *= camSpeed;
 	
 	f32	camMoveZoom	= ZTGL::KeyDown(Options::zoomIn) - ZTGL::KeyDown(Options::zoomOut);
-	camMoveZoom *= CAM_ZOOM_SPEED;
+	camMoveZoom *= Options::CAM_ZOOM_SPEED;
 	
 	camX += camMoveX;
 	camY += camMoveY;
 	camZoom += camMoveZoom;
-	camZoom = CLAMP(CAM_ZOOM_MIN, camZoom, CAM_ZOOM_MAX);
+	camZoom = CLAMP(Options::CAM_ZOOM_MIN, camZoom, Options::CAM_ZOOM_MAX);
 	
 	// handle system mode-dependent behavior.
 	if (system == TILEMAP)
@@ -325,7 +334,13 @@ DrawIndicators()
 		selX = (i32)MAX(0.0f, selX);
 		selY = (i32)MAX(0.0f, selY);
 		
-		SDL_SetRenderDrawColor(Render::renderer, INDICATOR_COLOR);
+		SDL_SetRenderDrawColor(
+			Render::renderer,
+			Options::INDICATOR_COLOR.r,
+			Options::INDICATOR_COLOR.g,
+			Options::INDICATOR_COLOR.b,
+			Options::INDICATOR_COLOR.a
+		);
 		Render::RenderRectRel(selX, selY, 1.0f, 1.0f);
 		
 		char const*	toolNames[]	=
@@ -349,18 +364,35 @@ DrawIndicators()
 	// save status indicator.
 	if (unsaved)
 	{
-		SDL_SetRenderDrawColor(Render::renderer, UNSAVED_COLOR);
+		SDL_SetRenderDrawColor(
+			Render::renderer,
+			Options::UNSAVED_COLOR.r,
+			Options::UNSAVED_COLOR.g,
+			Options::UNSAVED_COLOR.b,
+			Options::UNSAVED_COLOR.a
+		);
 	}
 	else
 	{
-		SDL_SetRenderDrawColor(Render::renderer, SAVED_COLOR);
+		SDL_SetRenderDrawColor(
+			Render::renderer,
+			Options::SAVED_COLOR.r,
+			Options::SAVED_COLOR.g,
+			Options::SAVED_COLOR.b,
+			Options::SAVED_COLOR.a
+		);
 	}
 	
 	i32	windowWidth		{};
 	i32	windowHeight	{};
 	SDL_GetWindowSize(Render::window, &windowWidth, &windowHeight);
 	
-	SDL_Rect	r	{0, windowHeight - SAVE_BAR, windowWidth, SAVE_BAR};
+	SDL_Rect	r	{
+		0,
+		windowHeight - Options::SAVE_BAR,
+		windowWidth,
+		Options::SAVE_BAR
+	};
 	SDL_RenderFillRect(Render::renderer, &r);
 }
 

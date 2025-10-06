@@ -1,14 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#define	MAP_MAGIC	"[2de]MAG"
-#define	MAP_VERSION	1
-
-#define	MAX_MAP_WIDTH			65535
-#define	MAX_MAP_HEIGHT			65535
-#define	MAX_MAP_REGIONS		65535
-#define	MAX_MAP_ATTRS			65535
-#define	MAX_MAP_ATTR_LISTS	65534 // -1 because attribute lists are 1-indexed.
-
 // map file structure; start to end, data is packed.
 //
 // size (bytes)  field
@@ -50,6 +41,14 @@
 
 namespace Map
 {
+
+constexpr char const*	MAGIC				= "[2de]MAG";
+constexpr u8				VERSION			= 1;
+constexpr u32				MAX_WIDTH		= 65535;
+constexpr u32				MAX_HEIGHT		= 65535;
+constexpr u32				MAX_REGIONS		= 65535;
+constexpr u32				MAX_ATTRS		= 65535;
+constexpr u32				MAX_ATTR_LISTS	= 65534; // 1 less because 1-indexed.
 
 enum AttrType : u8
 {

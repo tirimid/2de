@@ -1,39 +1,40 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// window options.
-#define	SDL_FLAGS				SDL_INIT_VIDEO
-#define	ERROR_WINDOW_TITLE	"2de - Error"
-#define	WINDOW_TITLE			"2de"
-#define	WINDOW_WIDTH			900
-#define	WINDOW_HEIGHT			700
-#define	WINDOW_FLAGS			(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED)
-#define	RENDERER_FLAGS			0
-
-// system options.
-#define	TICK_MILLI		20
-#define	TICK_MICRO		(1000 * TICK_MILLI)
-#define	CAM_ZOOM_SPEED	0.03f
-#define	CAM_SPEED_BASE	0.15f
-#define	CAM_SPEED_FAST	0.4f
-
-// stylistic options.
-#define	FONT_SIZE			24
-#define	UI_PAD				5
-#define	UI_TEXT_FIELD_BAR	2
-#define	DRAW_SCALE			50
-#define	SAVE_BAR				10
-#define	BG_COLOR				80,	80,	80,	255
-#define	SAVED_COLOR			0,		255,	0,		255
-#define	UNSAVED_COLOR		255,	0,		0,		255
-#define	OUTLINE_COLOR		0,		0,		0,		255
-#define	INDICATOR_COLOR	0,		255,	0,		90
-#define	CAM_ZOOM_MAX		1.2f
-#define	CAM_ZOOM_MIN		0.2f
-#define	COLOR_SEED			0
-
 namespace Options
 {
 
+// window options (static).
+constexpr u64				SDL_FLAGS				= SDL_INIT_VIDEO;
+constexpr char const*	ERROR_WINDOW_TITLE	= "2de - Error";
+constexpr char const*	WINDOW_TITLE			= "2de";
+constexpr i32				WINDOW_WIDTH			= 900;
+constexpr i32				WINDOW_HEIGHT			= 700;
+constexpr u64				WINDOW_FLAGS			= SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
+constexpr u64				RENDERER_FLAGS			= 0;
+
+// system options (static).
+constexpr i32				TICK_MILLI				= 20;
+constexpr i32				TICK_MICRO				= 1000 * TICK_MILLI;
+constexpr f32				CAM_ZOOM_SPEED			= 0.03f;
+constexpr f32				CAM_SPEED_BASE			= 0.15f;
+constexpr f32				CAM_SPEED_FAST			= 0.4f;
+
+// stylistic options (static).
+constexpr i32				FONT_SIZE				= 24;
+constexpr i32				UI_PAD					= 5;
+constexpr i32				UI_TEXT_FIELD_BAR		= 2;
+constexpr i32				DRAW_SCALE				= 50;
+constexpr i32				SAVE_BAR					= 10;
+constexpr SDL_Color		BG_COLOR					{80,	80,	80,	255};
+constexpr SDL_Color		SAVED_COLOR				{0,	255,	0,		255};
+constexpr SDL_Color		UNSAVED_COLOR			{255,	0,		0,		255};
+constexpr SDL_Color		OUTLINE_COLOR			{0,	0,		0,		255};
+constexpr SDL_Color		INDICATOR_COLOR		{0,	255,	0,		90};
+constexpr f32				CAM_ZOOM_MAX			= 1.2f;
+constexpr f32				CAM_ZOOM_MIN			= 0.2f;
+constexpr i32				COLOR_SEED				= 0;
+
+// key options (dynamic).
 extern SDL_Keycode	menu;
 extern SDL_Keycode	up;
 extern SDL_Keycode	right;

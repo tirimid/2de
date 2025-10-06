@@ -31,14 +31,14 @@ main(int argc, char* argv[])
 	(void)argv;
 	
 	ZTGL::conf.m_Log					= stderr;
-	ZTGL::conf.m_ErrorTitle			= ERROR_WINDOW_TITLE;
-	ZTGL::conf.m_TickMicro			= TICK_MICRO;
-	ZTGL::conf.m_UIPad				= UI_PAD;
-	ZTGL::conf.m_UITextFieldBar	= UI_TEXT_FIELD_BAR;
+	ZTGL::conf.m_ErrorTitle			= Options::ERROR_WINDOW_TITLE;
+	ZTGL::conf.m_TickMicro			= Options::TICK_MICRO;
+	ZTGL::conf.m_UIPad				= Options::UI_PAD;
+	ZTGL::conf.m_UITextFieldBar	= Options::UI_TEXT_FIELD_BAR;
 	ZTGL::conf.m_RenderRect			= ZTGL::Platform::RenderRect;
 	ZTGL::conf.m_RenderText			= ZTGL::Platform::RenderText;
 	
-	if (SDL_Init(SDL_FLAGS))
+	if (SDL_Init(Options::SDL_FLAGS))
 	{
 		ZTGL::Error("main: failed to init SDL2!");
 		return (1);

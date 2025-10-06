@@ -12,14 +12,6 @@ extern "C"
 #include	<SDL_ttf.h>
 }
 
-//--------------------------//
-// library meta-information //
-//--------------------------//
-
-#define	ZTGL_VER_MAJOR	1
-#define	ZTGL_VER_MINOR	3
-#define	ZTGL_VER_PATCH	0
-
 //--------//
 // macros //
 //--------//
@@ -44,12 +36,6 @@ extern "C"
 #define	ZTGL_BEGIN_TIMER(timer)
 #define	ZTGL_END_TIMER(timer, name)
 #endif
-
-// library data constants.
-#define	ZTGL_BATCH_ALIGN			16
-#define	ZTGL_MAX_OPTION_KEY		128
-#define	ZTGL_MAX_OPTION_VALUE	128
-#define	ZTGL_OPTION_SCAN			"%127s = %127[^\r\n]"
 
 // resource inclusion.
 #define	ZTGL_INC_XXD(name) \
@@ -87,6 +73,57 @@ using f64	= double;
 
 namespace ZTGL
 {
+
+//-----------//
+// constants //
+//-----------//
+
+// library meta-information.
+constexpr i32				VERSION_MAJOR		= 1;
+constexpr i32				VERSION_MINOR		= 5;
+constexpr i32				VERSION_PATCH		= 0;
+
+// data constants.
+constexpr usize			MEMORY_ALIGN		= 16;
+constexpr usize			MAX_OPTION_KEY		= 128;
+constexpr usize			MAX_OPTION_VALUE	= 128;
+constexpr char const*	OPTION_SCAN			= "%127s = %127[^\r\n]";
+
+// UI colors.
+constexpr SDL_Color	DEFAULT_COLORS[]	=
+{
+	{0,	0,		0, 	128}, // panel.
+	{255,	255,	255,	255}, // label text.
+	{255,	255,	255,	128}, // button.
+	{0,	0,		0,		255}, // button press.
+	{128,	128,	128,	255}, // button hover.
+	{255,	255,	255,	255}, // button text.
+	{255,	255,	255,	255}, // button press text.
+	{255,	255,	255,	255}, // button hover text.
+	{0,	0,		0,		128}, // slider.
+	{0,	0,		0,		255}, // slider press.
+	{0,	0,		0,		255}, // slider hover.
+	{128,	128,	128,	255}, // slider bar.
+	{128,	128,	128,	255}, // slider press bar.
+	{128,	128,	128,	255}, // slider hover bar.
+	{255,	255,	255,	255}, // slider text.
+	{255,	255,	255,	255}, // slider press text.
+	{255,	255,	255,	255}, // slider hover text.
+	{0,	0,		0,		128}, // textfield.
+	{0,	0,		0,		255}, // textfield press.
+	{0,	0,		0,		255}, // textfield hover.
+	{255,	255,	255,	255}, // textfield text.
+	{255,	255,	255,	255}, // textfield press text.
+	{255,	255,	255,	255}, // textfield hover text.
+	{255,	255,	255,	255}, // textfield bar.
+	{255,	255,	255,	255}, // textfield press bar.
+	{255,	255,	255,	255}, // textfield hover bar.
+	{128,	128,	128,	255}, // textfield prompt.
+	{128,	128,	128,	255}, // textfield press prompt.
+	{128,	128,	128,	255}, // textfield hover prompt.
+	{0,	0,		0,		128} // inactive.
+};
+
 
 //--------------------//
 // enumeration values //
@@ -157,12 +194,10 @@ struct PlatformConf
 #ifdef	ZTGL_SDL2_RENDERER
 	SDL_Renderer*	m_Renderer;
 	TTF_Font*		m_Font;
-#else
-	i32				m_Ignore; // struct cannot be empty.
 #endif
 };
 
-struct Res
+struct Resource
 {
 	u8*	m_Data;
 	u32&	m_Size;
@@ -246,6 +281,12 @@ struct ReallocBatchDesc
 	usize		m_Size;
 };
 
+struct Allocation
+{
+	usize	m_Offset;
+	usize	m_Length;
+};
+
 //------------------------------//
 // data structures with methods //
 //------------------------------//
@@ -288,18 +329,47 @@ struct UIPanel
 	UIPanel(UIElem elems[], usize elemsCapacity, TTF_Font* font, SDL_Window const* window);
 };
 
-//-----------------------//
-// library configuration //
-//-----------------------//
+// memory management.
+struct BumpAllocator
+{
+	u8*	m_Buffer		{};
+	usize	m_Capacity	{};
+	usize	m_Length		{};
+	
+	void*	Alloc(usize n);
+	void	Reset();
+	
+	BumpAllocator(u8* buffer, usize capacity);
+};
+
+struct LinkedListAllocator
+{
+	// TODO: define interface for linked list allocator.
+};
+
+struct ArrayAllocator
+{
+	u8*			m_Buffer						{};
+	usize			m_BufferCapacity			{};
+	Allocation*	m_Allocations				{};
+	usize			m_AllocationsCapacity	{};
+	usize			m_AllocationsLength		{};
+	
+	void*			Alloc(usize n);
+	void			Free(void* pointer);
+	void*			Realloc(void* pointer, usize n);
+	bool			RegionFree(usize offset, usize length);
+	void			Reset();
+	
+	ArrayAllocator(u8* buffer, usize bufferCapacity, Allocation* allocations, usize allocationsCapacity);
+};
+
+//-------------------------------//
+// dynamic library configuration //
+//-------------------------------//
 
 extern Conf				conf; // initialize before using library.
 extern PlatformConf	platformConf; // initialize before using Platform::.
-
-//-------------//
-// data tables //
-//-------------//
-
-extern u8	defaultColors[][4];
 
 //-----------------------//
 // standalone procedures //
@@ -318,6 +388,7 @@ bool			MouseReleased(i32 button);
 bool			TextInput(char c);
 bool			ShiftDown();
 bool			CtrlDown();
+bool			AltDown();
 
 // options.
 ErrorCode	OptionRaw(OUT char data[], FILE* file, char const* key);
@@ -411,40 +482,6 @@ u64	tickStart;
 Conf				conf;
 PlatformConf	platformConf;
 
-u8	defaultColors[][4]	=
-{
-	{0,	0,		0, 	128}, // panel.
-	{255,	255,	255,	255}, // label text.
-	{255,	255,	255,	128}, // button.
-	{0,	0,		0,		255}, // button press.
-	{128,	128,	128,	255}, // button hover.
-	{255,	255,	255,	255}, // button text.
-	{255,	255,	255,	255}, // button press text.
-	{255,	255,	255,	255}, // button hover text.
-	{0,	0,		0,		128}, // slider.
-	{0,	0,		0,		255}, // slider press.
-	{0,	0,		0,		255}, // slider hover.
-	{128,	128,	128,	255}, // slider bar.
-	{128,	128,	128,	255}, // slider press bar.
-	{128,	128,	128,	255}, // slider hover bar.
-	{255,	255,	255,	255}, // slider text.
-	{255,	255,	255,	255}, // slider press text.
-	{255,	255,	255,	255}, // slider hover text.
-	{0,	0,		0,		128}, // textfield.
-	{0,	0,		0,		255}, // textfield press.
-	{0,	0,		0,		255}, // textfield hover.
-	{255,	255,	255,	255}, // textfield text.
-	{255,	255,	255,	255}, // textfield press text.
-	{255,	255,	255,	255}, // textfield hover text.
-	{255,	255,	255,	255}, // textfield bar.
-	{255,	255,	255,	255}, // textfield press bar.
-	{255,	255,	255,	255}, // textfield hover bar.
-	{128,	128,	128,	255}, // textfield prompt.
-	{128,	128,	128,	255}, // textfield press prompt.
-	{128,	128,	128,	255}, // textfield hover prompt.
-	{0,	0,		0,		128} // inactive.
-};
-
 //-------//
 // input //
 //-------//
@@ -464,7 +501,7 @@ HandleInput(SDL_Event const& event)
 		if (key & 1 << 30)
 		{
 			key &= ~(1 << 30);
-			key += 12;
+			key += 128;
 		}
 		
 		usize	byte	= key / 8;
@@ -626,6 +663,14 @@ CtrlDown()
 	return (down);
 }
 
+bool
+AltDown()
+{
+	SDL_Keymod	modState	= SDL_GetModState();
+	bool			down		= modState & KMOD_LALT || modState & KMOD_RALT;
+	return (down);
+}
+
 //---------//
 // options //
 //---------//
@@ -655,8 +700,8 @@ OptionRaw(OUT char data[], FILE* file, char const* key)
 		}
 		
 		fseek(file, -1, SEEK_CUR);
-		char	keyBuffer[ZTGL_MAX_OPTION_KEY]	= {0};
-		if (fscanf(file, ZTGL_OPTION_SCAN, keyBuffer, data) != 2)
+		char	keyBuffer[MAX_OPTION_KEY]	= {0};
+		if (fscanf(file, OPTION_SCAN, keyBuffer, data) != 2)
 		{
 			return (INVALID_FORMAT);
 		}
@@ -678,7 +723,7 @@ OptionRaw(OUT char data[], FILE* file, char const* key)
 ErrorCode
 OptionKeycode(OUT SDL_Keycode& data, FILE* file, char const* key)
 {
-	char			buffer[ZTGL_MAX_OPTION_VALUE]	= {0};
+	char			buffer[MAX_OPTION_VALUE]	= {0};
 	ErrorCode	err	= OptionRaw(buffer, file, key);
 	if (err)
 	{
@@ -697,7 +742,7 @@ OptionKeycode(OUT SDL_Keycode& data, FILE* file, char const* key)
 ErrorCode
 OptionFloat(OUT f32& data, FILE* file, char const* key)
 {
-	char			buffer[ZTGL_MAX_OPTION_VALUE]	= {0};
+	char			buffer[MAX_OPTION_VALUE]	= {0};
 	ErrorCode	err	= OptionRaw(buffer, file, key);
 	if (err)
 	{
@@ -717,7 +762,7 @@ OptionFloat(OUT f32& data, FILE* file, char const* key)
 ErrorCode
 OptionInt(OUT i64& data, FILE* file, char const* key)
 {
-	char			buffer[ZTGL_MAX_OPTION_VALUE]	= {0};
+	char			buffer[MAX_OPTION_VALUE]	= {0};
 	ErrorCode	err	= OptionRaw(buffer, file, key);
 	if (err)
 	{
@@ -737,7 +782,7 @@ OptionInt(OUT i64& data, FILE* file, char const* key)
 ErrorCode
 OptionBool(OUT bool& data, FILE* file, char const* key)
 {
-	char			buffer[ZTGL_MAX_OPTION_VALUE]	= {0};
+	char			buffer[MAX_OPTION_VALUE]	= {0};
 	ErrorCode 	err	= OptionRaw(buffer, file, key);
 	if (err)
 	{
@@ -1293,6 +1338,116 @@ UIPanel::HoldButton(char const* text)
 	return (state);
 }
 
+//-------------------//
+// memory management //
+//-------------------//
+
+void*
+BumpAllocator::Alloc(usize n)
+{
+	u8*	allocation	= &m_Buffer[m_Length];
+	m_Length += n;
+	m_Length = Align(m_Length, MEMORY_ALIGN);
+	
+	u8*	actual	= m_Length > m_Capacity ? nullptr : allocation;
+	return (actual);
+}
+
+void
+BumpAllocator::Reset()
+{
+	memset(m_Buffer, 0, m_Capacity);
+	m_Length = 0;
+}
+
+BumpAllocator::BumpAllocator(u8* buffer, usize capacity)
+	: m_Buffer(buffer), m_Capacity(capacity)
+{
+	memset(m_Buffer, 0, m_Capacity);
+}
+
+void*
+ArrayAllocator::Alloc(usize n)
+{
+	if (m_AllocationsLength >= m_AllocationsCapacity)
+	{
+		return (nullptr);
+	}
+	
+	for (usize i = 0; i < m_AllocationsLength; ++i)
+	{
+		usize	offset	= m_Allocations[i].m_Offset + m_Allocations[i].m_Length;
+		offset = Align(offset, MEMORY_ALIGN);
+		
+		if (!RegionFree(offset, n))
+		{
+			continue;
+		}
+		
+		if (offset + n > m_BufferCapacity)
+		{
+			continue;
+		}
+		
+		m_Allocations[m_AllocationsLength].m_Offset	= offset;
+		m_Allocations[m_AllocationsLength].m_Length	= n;
+		++m_AllocationsLength;
+		return (&m_Buffer[offset]);
+	}
+	
+	return (nullptr);
+}
+
+void
+ArrayAllocator::Free(void* pointer)
+{
+	// TODO: implement.
+}
+
+void*
+ArrayAllocator::Realloc(void* pointer, usize n)
+{
+	// TODO: implement.
+}
+
+bool
+ArrayAllocator::RegionFree(usize offset, usize length)
+{
+	for (usize i = 0; i < m_AllocationsLength; ++i)
+	{
+		bool	noOverlapLeft	= offset + length < m_Allocations[i].m_Offset;
+		bool	noOverlapRight	= offset >= m_Allocations[i].m_Offset + m_Allocations[i].m_Length;
+		bool	noOverlap		= noOverlapLeft || noOverlapRight;
+		
+		if (!noOverlap)
+		{
+			return (false);
+		}
+	}
+	return (true);
+}
+
+void
+ArrayAllocator::Reset()
+{
+	memset(m_Buffer, 0, m_BufferCapacity);
+	m_AllocationsLength = 0;
+}
+
+ArrayAllocator::ArrayAllocator(
+	u8*			buffer,
+	usize			bufferCapacity,
+	Allocation*	allocations,
+	usize			allocationsCapacity
+)
+	: m_Buffer(buffer),
+	m_BufferCapacity(bufferCapacity),
+	m_Allocations(allocations),
+	m_AllocationsCapacity(allocationsCapacity)
+{
+	memset(m_Buffer, 0, m_BufferCapacity);
+}
+
 //------//
 // util //
 //------//
@@ -1303,7 +1458,7 @@ Error(char const* format, ...)
 	va_list	args	{};
 	va_start(args, format);
 	
-	char	msg[512];
+	char	msg[512]	= {0};
 	vsnprintf(msg, sizeof(msg), format, args);
 	
 	if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, conf.m_ErrorTitle, msg, nullptr))
@@ -1391,7 +1546,7 @@ AllocBatch(IN_OUT AllocBatchDesc allocs[], usize nAllocs)
 	for (usize i = 0; i < nAllocs; ++i)
 	{
 		size += allocs[i].m_Count * allocs[i].m_Size;
-		size = Align(size, ZTGL_BATCH_ALIGN);
+		size = Align(size, MEMORY_ALIGN);
 	}
 	
 	u8*	p	= (u8*)malloc(size);
@@ -1405,7 +1560,7 @@ AllocBatch(IN_OUT AllocBatchDesc allocs[], usize nAllocs)
 	{
 		*allocs[i].m_Pointer = &p[offset];
 		offset += allocs[i].m_Count * allocs[i].m_Size;
-		offset = Align(offset, ZTGL_BATCH_ALIGN);
+		offset = Align(offset, MEMORY_ALIGN);
 	}
 	
 	return (p);
@@ -1423,11 +1578,11 @@ ReallocBatch(void* p, IN_OUT ReallocBatchDesc reallocs[], usize nReallocs)
 	{
 		newOffsets[i] = newSize;
 		newSize += reallocs[i].m_NewCount * reallocs[i].m_Size;
-		newSize = Align(newSize, ZTGL_BATCH_ALIGN);
+		newSize = Align(newSize, MEMORY_ALIGN);
 		
 		oldOffsets[i] = oldSize;
 		oldSize += reallocs[i].m_OldCount * reallocs[i].m_Size;
-		oldSize = Align(oldSize, ZTGL_BATCH_ALIGN);
+		oldSize = Align(oldSize, MEMORY_ALIGN);
 	}
 	
 	p = realloc(p, newSize);
@@ -1473,10 +1628,10 @@ RenderRect(i32 x, i32 y, i32 w, i32 h, Color color)
 {
 	SDL_SetRenderDrawColor(
 		platformConf.m_Renderer,
-		defaultColors[color][0],
-		defaultColors[color][1],
-		defaultColors[color][2],
-		defaultColors[color][3]
+		DEFAULT_COLORS[color].r,
+		DEFAULT_COLORS[color].g,
+		DEFAULT_COLORS[color].b,
+		DEFAULT_COLORS[color].a
 	);
 	
 	SDL_Rect	r	{x, y, w, h};
@@ -1494,10 +1649,10 @@ void
 RenderText(i32 x, i32 y, i32 w, i32 h, char const* text, Color color)
 {
 	SDL_Color	rgba	{
-		defaultColors[color][0],
-		defaultColors[color][1],
-		defaultColors[color][2],
-		defaultColors[color][3]
+		DEFAULT_COLORS[color].r,
+		DEFAULT_COLORS[color].g,
+		DEFAULT_COLORS[color].b,
+		DEFAULT_COLORS[color].a
 	};
 	
 	SDL_Surface*	surface	= TTF_RenderUTF8_Solid(

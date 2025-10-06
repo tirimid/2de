@@ -7,18 +7,18 @@ SDL_Window*		window;
 SDL_Renderer*	renderer;
 TTF_Font*		font;
 
-static ZTGL::Res	fontResource	= ZTGL_INC_RES(vcr_osd_mono_ttf);
+static ZTGL::Resource	fontResource	= ZTGL_INC_RES(vcr_osd_mono_ttf);
 
 i32
 Init(void)
 {
 	window = SDL_CreateWindow(
-		WINDOW_TITLE,
+		Options::WINDOW_TITLE,
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
-		WINDOW_FLAGS
+		Options::WINDOW_WIDTH,
+		Options::WINDOW_HEIGHT,
+		Options::WINDOW_FLAGS
 	);
 	if (!window)
 	{
@@ -26,7 +26,7 @@ Init(void)
 		return (1);
 	}
 	
-	renderer = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
+	renderer = SDL_CreateRenderer(window, -1, Options::RENDERER_FLAGS);
 	if (!renderer)
 	{
 		ZTGL::Error("render: failed to create renderer - %s!", SDL_GetError());
@@ -44,7 +44,7 @@ Init(void)
 		return (1);
 	}
 	
-	font = TTF_OpenFontRW(rwOps, 1, FONT_SIZE);
+	font = TTF_OpenFontRW(rwOps, 1, Options::FONT_SIZE);
 	if (!font)
 	{
 		ZTGL::Error("render: failed to open font - %s!", TTF_GetError());
@@ -64,8 +64,8 @@ ScreenToGame(OUT f32& gameX, OUT f32& gameY, i32 screenX, i32 screenY)
 	i32	windowHeight	{};
 	SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	
-	gameX = (screenX - windowWidth / 2) / (Editor::camZoom * DRAW_SCALE) + Editor::camX;
-	gameY = (screenY - windowHeight / 2) / (Editor::camZoom * DRAW_SCALE) + Editor::camY;
+	gameX = (screenX - windowWidth / 2) / (Editor::camZoom * Options::DRAW_SCALE) + Editor::camX;
+	gameY = (screenY - windowHeight / 2) / (Editor::camZoom * Options::DRAW_SCALE) + Editor::camY;
 }
 
 void
@@ -75,8 +75,8 @@ GameToScreen(OUT i32& screenX, OUT i32& screenY, f32 gameX, f32 gameY)
 	i32	windowHeight	{};
 	SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	
-	screenX = Editor::camZoom * DRAW_SCALE * (gameX - Editor::camX) + windowWidth / 2;
-	screenY = Editor::camZoom * DRAW_SCALE * (gameY - Editor::camY) + windowHeight / 2;
+	screenX = Editor::camZoom * Options::DRAW_SCALE * (gameX - Editor::camX) + windowWidth / 2;
+	screenY = Editor::camZoom * Options::DRAW_SCALE * (gameY - Editor::camY) + windowHeight / 2;
 }
 
 void
@@ -87,8 +87,8 @@ RenderRectRel(f32 x, f32 y, f32 w, f32 h)
 	SDL_Rect	r	{
 		0,
 		0,
-		(i32)(Editor::camZoom * DRAW_SCALE * w + 1),
-		(i32)(Editor::camZoom * DRAW_SCALE * h + 1)
+		(i32)(Editor::camZoom * Options::DRAW_SCALE * w + 1),
+		(i32)(Editor::camZoom * Options::DRAW_SCALE * h + 1)
 	};
 	GameToScreen(r.x, r.y, x, y);
 	SDL_RenderFillRect(renderer, &r);
@@ -100,8 +100,8 @@ RenderHollowRectRel(f32 x, f32 y, f32 w, f32 h)
 	SDL_Rect	r	{
 		0,
 		0,
-		(i32)(Editor::camZoom * DRAW_SCALE * w + 1),
-		(i32)(Editor::camZoom * DRAW_SCALE * h + 1)
+		(i32)(Editor::camZoom * Options::DRAW_SCALE * w + 1),
+		(i32)(Editor::camZoom * Options::DRAW_SCALE * h + 1)
 	};
 	GameToScreen(r.x, r.y, x, y);
 	SDL_RenderDrawRect(renderer, &r);
